@@ -5,5 +5,5 @@ SAMADHANAM is an AI-driven civic issue reporting and resolution platform that em
 ## 👥 Authors
 
 - **Nikhil Kumar** – [@nikhilKumar](https://github.com/nikhilkumar)
-- **Priya Sharma** – [@pranshukumar](https://github.com/Coders330)
-- **Ravi Verma** – [@VayuNandanMishra](https://github.com/Vann781)
+- **Pranshu Kumar** – [@pranshukumar](https://github.com/Coders330)
+- **Vayu Nandan Mishra** – [@VayuNandanMishra](https://github.com/Vann781)

@@ -55,22 +55,6 @@ class HeroSection extends StatelessWidget {
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withOpacity(0.9),
                   ),
-                ),
-                const Spacer(),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    // TODO: Navigate to the report issue screen
-                  },
-                  icon: const Icon(Icons.add_location_alt_rounded),
-                  label: const Text('Report a New Issue'),
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: theme.primaryColor,
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  ),
                 )
               ],
             ),

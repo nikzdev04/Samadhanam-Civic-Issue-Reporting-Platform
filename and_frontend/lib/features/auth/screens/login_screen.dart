@@ -47,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
               SnackBar(content: Text('Welcome back, ${user['name']}')),
             );
             // Navigate to the next screen on successful login
-            Navigator.pushReplacementNamed(context, AppRouter.roleSelection);
+            Navigator.pushReplacementNamed(context, AppRouter.mainShell);
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Invalid email or password.')),

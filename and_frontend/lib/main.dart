@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:helpcivic/app/router.dart';
 import 'package:helpcivic/app/theme.dart';
 import 'package:helpcivic/features/auth/screens/login_screen.dart';
+import 'package:helpcivic/mongodb.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  MongoDatabase.connect();
   runApp(const SmartCivicApp());
 }
 

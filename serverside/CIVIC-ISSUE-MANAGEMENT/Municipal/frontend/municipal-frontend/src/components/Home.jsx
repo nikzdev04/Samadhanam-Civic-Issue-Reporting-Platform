@@ -1,6 +1,30 @@
-import React from 'react'
-
+import axios from 'axios';
+import React, { useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { useEffect } from 'react';
+import { toast } from 'react-toastify';
 const Home = () => {
+  const {id} = useParams();
+  const [municipal,setMunicipal] = useState([]);
+  useEffect(() => {
+    const fetchMunicipality = async () => {
+      try {
+        const { data } = await axios.post("http://localhost:4040"+"/municipalities/fetchDistrict",{id});
+        console.log("Response:", data);
+
+        if (data.success) {
+          setMunicipal(data.district);
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching municipality:", error);
+        toast.error("Unable to load municipal data");
+      } 
+    };
+
+    fetchMunicipality();
+  }, [id]);
   return (
     <div>
       <div className="w-full">
@@ -19,7 +43,7 @@ const Home = () => {
               className="h-12 w-12 rounded-full border"
             />
             <span className="text-blue-700 text-xl font-semibold tracking-wide">
-              Ghaziabad Municipal Corporation
+              {municipal.district_name} Municipal Corporation
             </span>
           </div>
           <div className="flex items-center gap-8">
@@ -27,26 +51,26 @@ const Home = () => {
               14:00:56
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-gray-700 font-medium">John Doe</span>
+              <span className="text-gray-700 font-medium">{municipal.official_username}</span>
             </div>
           </div>
         </nav>
         <div className='flex-col justify-center items-center gap-y-10 md:w-full md:h-1/2 flex md:flex-row md:gap-6 md:p-4 mt-10'>
           <div className='p-15 bg-green-400  md:bg-green-400 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
             <h1 className='text-3xl'>Solved</h1>
-            <h2 className='text-7xl mt-3'>300</h2>
+            <h2 className='text-7xl mt-3'>{municipal.solved}</h2>
           </div>
           <div className='p-15 bg-orange-400  md:bg-orange-400 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
-            <h1 className='text-3xl'>Unsolved</h1>
-            <h2 className='text-7xl mt-3'>140</h2>
+            <h1 className='text-3xl'>Pending</h1>
+            <h2 className='text-7xl mt-3'>{municipal.pending}</h2>
           </div>
           <div className='p-15 bg-gray-500  md:bg-gray-500 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
             <h1 className='text-3xl'>Escalated</h1>
-            <h2 className='text-7xl mt-3'>20</h2>
+            <h2 className='text-7xl mt-3'>{municipal.demerits}</h2>
           </div>
           <div className='p-15 bg-red-400  md:bg-red-400 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
             <h1 className='text-3xl'>Demerits</h1>
-            <h2 className='text-7xl mt-3'>26</h2>
+            <h2 className='text-7xl mt-3'>{municipal.demerits}</h2>
           </div>
         </div>
 
@@ -82,59 +106,22 @@ const Home = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td className="px-6 py-4">CMP001</td>
-                <td className="px-6 py-4">Garbage</td>
-                <td className="px-6 py-4">2024-06-01</td>
-                <td className="px-6 py-4"><span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Solved</span></td>
-                <td className="px-6 py-4">Amit Sharma</td>
-                <td>
-                  <button className='bg-orange-500 p-3 text-white rounded-2xl'>View Details</button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4">CMP002</td>
-                <td className="px-6 py-4">Pothhole</td>
-                <td className="px-6 py-4">2024-06-02</td>
-                <td className="px-6 py-4"><span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs">Unsolved</span></td>
-                <td className="px-6 py-4">Priya Singh</td>
-                <td>
-                  <button className='bg-orange-500 p-3 text-white rounded-2xl'>View Details</button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4">CMP003</td>
-                <td className="px-6 py-4">Street Light</td>
-                <td className="px-6 py-4">2024-06-03</td>
-                <td className="px-6 py-4"><span className="bg-gray-200 text-gray-800 px-2 py-1 rounded-full text-xs">Escalated</span></td>
-                <td className="px-6 py-4">Rahul Verma</td>
-                <td>
-                  <button className='bg-orange-500 p-3 text-white rounded-2xl'>View Details</button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4">CMP004</td>
-                <td className="px-6 py-4">Drainage</td>
-                <td className="px-6 py-4">2024-06-04</td>
-                <td className="px-6 py-4"><span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">Demerits</span></td>
-                <td className="px-6 py-4">Sunita Yadav</td>
-                <td>
-                  <button className='bg-orange-500 p-3 text-white rounded-2xl'>View Details</button>
-                </td>
-              </tr>
-              <tr>
-                <td className="px-6 py-4">CMP005</td>
-                <td className="px-6 py-4">Roads</td>
-                <td className="px-6 py-4">2024-06-05</td>
-                <td className="px-6 py-4"><span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Solved</span></td>
-                <td className="px-6 py-4">Vikas Gupta</td>
-                <td>
-                  <button className='bg-orange-500 p-3 text-white rounded-2xl'>View Details</button>
-                </td>
-              </tr>
-              <tr>
-                
-              </tr>
+              {/* {municipal.complaints.map((complaint) => (
+                <tr key={complaint.id}>
+                  <td className="px-6 py-4">{complaint.id}</td>
+                  <td className="px-6 py-4">{complaint.category}</td>
+                  <td className="px-6 py-4">{complaint.date}</td>
+                  <td className="px-6 py-4">
+                    <span className={`bg-${complaint.status === "Solved" ? "green" : "red"}-100 text-${complaint.status === "Solved" ? "green" : "red"}-800 px-2 py-1 rounded-full text-xs`}>
+                      {complaint.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">{complaint.assignedTo}</td>
+                  <td>
+                    <button className='bg-orange-500 p-3 text-white rounded-2xl'>View Details</button>
+                  </td>
+                </tr>
+              ))} */}
             </tbody>
           </table>
         </div>
@@ -143,4 +130,6 @@ const Home = () => {
   )
 }
 
-export default Home
+export default Home;
+
+

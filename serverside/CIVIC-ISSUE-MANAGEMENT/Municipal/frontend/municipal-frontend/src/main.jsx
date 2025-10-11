@@ -7,9 +7,10 @@ import Login from './components/Login.jsx'
 import Home from './components/Home.jsx'
 import ComplaintItem from './components/ComplaintItem.jsx'
 import React, { useRef } from 'react'
+import { Provider } from 'react-redux'
 const router = createBrowserRouter([
   {
-     path:"/login",
+     path:"/",
      element:<Login></Login>,
   },
 
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
          element: <Home></Home>
       },
       {
-        path:"Compomplaints/:id",
+        path:"Complaints/:id",
         element: <ComplaintItem></ComplaintItem>
       },
       
@@ -32,7 +33,9 @@ const router = createBrowserRouter([
 ])
 
 createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <RouterProvider router={router}></RouterProvider>
+   <React.StrictMode>
+    
+    <RouterProvider router={router} />
+    
   </React.StrictMode>,
 )

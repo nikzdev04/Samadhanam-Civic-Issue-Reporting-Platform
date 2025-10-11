@@ -77,14 +77,201 @@
 
 
 
-// api_service.dart
+// // api_service.dart
+// import 'package:helpcivic/data/models/complaint_model.dart';
+// import 'package:helpcivic/mongodb.dart';
+// import 'package:helpcivic/mongodb.dart'; // 👈 Import your MongoDatabase
+//
+// // This is a mock API service that simulates network requests for the demo.
+// class ApiService {
+//   // Removed _mockComplaints - we will use the actual database
+//
+//   // Simulates fetching all complaints for the user.
+//   Future<List<Complaint>> getMyComplaints() async {
+//     try {
+//       final complaintMaps = await MongoDatabase.getComplaints();
+//       // Map the MongoDB data to your Dart model
+//       return complaintMaps.map((json) => Complaint.fromJson(json)).toList();
+//     } catch (e) {
+//       print('Error in getMyComplaints: $e');
+//       return [];
+//     }
+//   }
+//
+//   // Simulates submitting a new complaint.
+//   // Now calls MongoDatabase.insertComplaint and returns a boolean for success.
+//   Future<bool> submitComplaint({
+//     required String title,
+//     required String description,
+//     required String imageUrl,
+//     required String location,
+//     double? latitude,
+//     double? longitude,
+//   }) async {
+//     // 1. Prepare the data map for MongoDB insertion
+//     final complaintData = {
+//       'title': title,
+//       'location': location,
+//       'latitude': latitude,
+//       'longitude': longitude,
+//       'raisedDate': DateTime.now().toIso8601String(),
+//       'status': ComplaintStatus.pending.toString().split('.').last, // 'pending'
+//       'description': description,
+//       'imageUrl': imageUrl,
+//       'timeline': [
+//         {
+//           'status': 'Submitted',
+//           'description': 'Complaint was submitted by the user.',
+//           'date': DateTime.now().toIso8601String(),
+//         },
+//       ],
+//       // 'userId' will be added in MongoDatabase.insertComplaint
+//     };
+//
+//     // 2. Call the database function
+//     final String? complaintId = await MongoDatabase.insertComplaint(complaintData);
+//
+//     // 3. Check for success and return boolean
+//     return complaintId != null;
+//   }
+// }
+
+
+// upper one working with ml
+//
+// import 'package:helpcivic/data/models/complaint_model.dart';
+// import 'package:helpcivic/mongodb.dart';
+//
+// // This is a mock API service that simulates network requests for the demo.
+// class ApiService {
+//   // Simulates fetching all complaints for the user.
+//   Future<List<Complaint>> getMyComplaints() async {
+//     try {
+//       final complaintMaps = await MongoDatabase.getComplaints();
+//       // Map the MongoDB data to your Dart model
+//       return complaintMaps.map((json) => Complaint.fromJson(json)).toList();
+//     } catch (e) {
+//       print('Error in getMyComplaints: $e');
+//       return [];
+//     }
+//   }
+//
+//   // Simulates submitting a new complaint.
+//   // Now calls MongoDatabase.insertComplaint and returns a boolean for success.
+//   Future<bool> submitComplaint({
+//     required String title,
+//     required String description,
+//     required String imageUrl,
+//     required String location,
+//     // --- 🚩 NEW: Required Geographical Context for Routing ---
+//     required String municipalityName,
+//     required String administrativeArea,
+//     required String country,
+//     // --------------------------------------------------------
+//     double? latitude,
+//     double? longitude,
+//   }) async {
+//     // 1. Prepare the data map for MongoDB insertion
+//     final complaintData = {
+//       'title': title,
+//       'location': location,
+//       'latitude': latitude,
+//       'longitude': longitude,
+//       // --- 🚩 ADDED: Geographical Context to the document ---
+//       'municipalityName': municipalityName,
+//       'administrativeArea': administrativeArea,
+//       'country': country,
+//       // ----------------------------------------------------
+//       'raisedDate': DateTime.now().toIso8601String(),
+//       'status': ComplaintStatus.pending.toString().split('.').last, // 'pending'
+//       'description': description,
+//       'imageUrl': imageUrl,
+//       'timeline': [
+//         {
+//           'status': 'Submitted',
+//           'description': 'Complaint was submitted by the user.',
+//           'date': DateTime.now().toIso8601String(),
+//         },
+//       ],
+//       // 'userId' will be added in MongoDatabase.insertComplaint
+//     };
+//
+//     // 2. Call the database function
+//     final String? complaintId = await MongoDatabase.insertComplaint(complaintData);
+//
+//     // 3. Check for success and return boolean
+//     return complaintId != null;
+//   }
+// }
+//
+//
+// import 'package:helpcivic/data/models/complaint_model.dart';
+// import 'package:helpcivic/mongodb.dart';
+// import 'package:helpcivic/mongodb.dart'; // 👈 Import your MongoDatabase
+//
+// // This is a mock API service that simulates network requests for the demo.
+// class ApiService {
+//   // Removed _mockComplaints - we will use the actual database
+//
+//   // Simulates fetching all complaints for the user.
+//   Future<List<Complaint>> getMyComplaints() async {
+//     try {
+//       final complaintMaps = await MongoDatabase.getComplaints();
+//       // Map the MongoDB data to your Dart model
+//       return complaintMaps.map((json) => Complaint.fromJson(json)).toList();
+//     } catch (e) {
+//       print('Error in getMyComplaints: $e');
+//       return [];
+//     }
+//   }
+//
+//   // Simulates submitting a new complaint.
+//   // Now calls MongoDatabase.insertComplaint and returns a boolean for success.
+//   Future<bool> submitComplaint({
+//     required String title,
+//     required String description,
+//     required String imageUrl,
+//     required String location,
+//     double? latitude,
+//     double? longitude,
+//   }) async {
+//     // 1. Prepare the data map for MongoDB insertion
+//     final complaintData = {
+//       'title': title,
+//       'location': location,
+//       'latitude': latitude,
+//       'longitude': longitude,
+//       'raisedDate': DateTime.now().toIso8601String(),
+//       'status': ComplaintStatus.pending.toString().split('.').last, // 'pending'
+//       'description': description,
+//       'imageUrl': imageUrl,
+//       'timeline': [
+//         {
+//           'status': 'Submitted',
+//           'description': 'Complaint was submitted by the user.',
+//           'date': DateTime.now().toIso8601String(),
+//         },
+//       ],
+//       // 'userId' will be added in MongoDatabase.insertComplaint
+//     };
+//
+//     // 2. Call the database function
+//     final String? complaintId = await MongoDatabase.insertComplaint(complaintData);
+//
+//     // 3. Check for success and return boolean
+//     return complaintId != null;
+//   }
+// }
+
+// worknggg
+
+
+
 import 'package:helpcivic/data/models/complaint_model.dart';
 import 'package:helpcivic/mongodb.dart';
-import 'package:helpcivic/mongodb.dart'; // 👈 Import your MongoDatabase
 
-// This is a mock API service that simulates network requests for the demo.
+// This service handles all data interactions with the backend (MongoDB).
 class ApiService {
-  // Removed _mockComplaints - we will use the actual database
 
   // Simulates fetching all complaints for the user.
   Future<List<Complaint>> getMyComplaints() async {
@@ -98,13 +285,17 @@ class ApiService {
     }
   }
 
-  // Simulates submitting a new complaint.
-  // Now calls MongoDatabase.insertComplaint and returns a boolean for success.
+  // Simulates submitting a new complaint, accepting all new geo fields.
   Future<bool> submitComplaint({
     required String title,
     required String description,
     required String imageUrl,
     required String location,
+    // 👇 NEW: Accept the classified type and structured location data
+    required String type,
+    required String municipalityName,
+    required String stateName,
+    required String countryName,
     double? latitude,
     double? longitude,
   }) async {
@@ -118,6 +309,11 @@ class ApiService {
       'status': ComplaintStatus.pending.toString().split('.').last, // 'pending'
       'description': description,
       'imageUrl': imageUrl,
+      // 👇 NEW: Include classification type and structured location data
+      'type': type,
+      'municipalityName': municipalityName,
+      'stateName': stateName,
+      'countryName': countryName,
       'timeline': [
         {
           'status': 'Submitted',

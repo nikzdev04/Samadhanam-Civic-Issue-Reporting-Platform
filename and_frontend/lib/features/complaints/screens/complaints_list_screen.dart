@@ -138,7 +138,7 @@ class _ComplaintsListScreenState extends State<ComplaintsListScreen> {
       ),
       body: Column(
         children: [
-          const FilterAndSearchBar(),
+          // const FilterAndSearchBar(),
           Expanded(
             child: FutureBuilder<List<Complaint>>(
               future: _complaintsFuture,

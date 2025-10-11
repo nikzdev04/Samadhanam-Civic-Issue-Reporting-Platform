@@ -1,23 +1,52 @@
+import React from 'react'
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { useParams } from 'react-router-dom'    
+import axios from 'axios';
+
 const Home = () => {
+  const [array,setArray] = useState([]); 
+  const [stateArray,setStateArray] = useState([]);
+  const {id} = useParams();
+  useEffect(() => {
+     const fetchData = async () => {
+        try {
+           const { data } = await axios.post("http://localhost:4005" + "/State/allDistricts", {id});
+           if(data.success && Array.isArray(data.districts)){
+              console.log("this is the received data",data.state.complaints);
+              setArray(data.districts);         // all districts 
+              setStateArray(data.state);   // one state 
+
+           }
+           else{
+              console.log(data.error);
+           }
+        } catch (error) {
+           console.error("Error fetching data:", error);
+        }
+     };
+     fetchData();
+  }, []);
+
   return (
     <div>
       
         <div className='flex-col justify-center items-center gap-y-10 md:w-full md:h-1/2 flex md:flex-row md:gap-6 md:p-4 mt-10'>
           <div className='p-15 bg-green-400  md:bg-green-400 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
             <h1 className='text-3xl'>Solved</h1>
-            <h2 className='text-7xl mt-3'>100</h2>
+            <h2 className='text-7xl mt-3'>{stateArray.solved}</h2>
           </div>
           <div className='p-15 bg-orange-400  md:bg-orange-400 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
-            <h1 className='text-3xl'>Unsolved</h1>
-            <h2 className='text-7xl mt-3'>40</h2>
+            <h1 className='text-3xl'>Pending</h1>
+            <h2 className='text-7xl mt-3'>{stateArray.pending}</h2>
           </div>
-          <div className='p-15 bg-gray-500  md:bg-gray-500 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
+          {/* <div className='p-15 bg-gray-500  md:bg-gray-500 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
             <h1 className='text-3xl'>Escalated</h1>
-            <h2 className='text-7xl mt-3'>20</h2>
-          </div>
+            <h2 className='text-7xl mt-3'>{}</h2>
+          </div> */}
           <div className='p-15 bg-red-400  md:bg-red-400 md:h-full md:w-1/4 md:p-15 md:flex md:flex-col md:justify-center md:items-center shadow-black shadow-lg rounded-4xl'>
-            <h1 className='text-3xl'>Demerits</h1>
-            <h2 className='text-7xl mt-3'>26</h2>
+            <h1 className='text-3xl'>Total Districts</h1>
+            <h2 className='text-7xl mt-3'>{array.length}</h2>
           </div>
         </div>
   
@@ -198,3 +227,4 @@ const Home = () => {
 }
 
 export default Home
+

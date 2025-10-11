@@ -19,7 +19,7 @@ const Login = () => {
           if(data.success === true){
                localStorage.setItem("Admin login token", data.tokens);
                const id = data.user.district_id;
-               navigate(`/District/${id}`);
+               navigate("/District/:id");
           }
           else{
             toast.error("Login failed");

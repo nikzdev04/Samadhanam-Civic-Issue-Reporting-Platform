@@ -396,6 +396,21 @@ class MongoDatabase {
     }
   }
 
+  static Future<Map<String, dynamic>?> getUserById(ObjectId userId) async {
+    if (db == null || !db.isConnected) {
+      print("Database not connected.");
+      return null;
+    }
+    try {
+      // Find one document where the _id matches the provided userId
+      final user = await usersCollection.findOne(where.id(userId));
+      return user;
+    } catch (e) {
+      print("Error fetching user by ID: $e");
+      return null;
+    }
+  }
+
   static Future<List<Map<String, dynamic>>> getComplaints() async {
     if (db == null || !db.isConnected || loggedInUserId == null) {
       print("Database not connected or user not logged in.");
@@ -439,6 +454,7 @@ class MongoDatabase {
         print("Error: Could not retrieve new complaint ID.");
         return null;
       }
+
 
       // 4. Add the new complaint's ID to the user's 'complaints' array in the 'users' collection
       await usersCollection.updateOne(

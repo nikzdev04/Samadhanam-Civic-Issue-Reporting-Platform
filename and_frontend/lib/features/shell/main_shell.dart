@@ -32,14 +32,14 @@ class _MainShellState extends State<MainShell> {
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to the Report Issue Screen
-          Navigator.pushNamed(context, AppRouter.reportIssue);
-        },
-        tooltip: 'Report an Issue',
-        child: const Icon(Icons.add_rounded),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     // Navigate to the Report Issue Screen
+      //     Navigator.pushNamed(context, AppRouter.reportIssue);
+      //   },
+      //   tooltip: 'Report an Issue',
+      //   child: const Icon(Icons.add_rounded),
+      // ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

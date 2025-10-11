@@ -2,56 +2,65 @@ import 'package:flutter/material.dart';
 import 'package:helpcivic/data/models/complaint_model.dart';
 import 'package:helpcivic/features/complaints/widgets/status_timeline.dart';
 import 'package:intl/intl.dart';
+import 'dart:io'; // Import dart:io for File
 
 class ComplaintDetailsScreen extends StatelessWidget {
   final Complaint complaint;
 
   const ComplaintDetailsScreen({super.key, required this.complaint});
 
+  // Helper function to check if a string looks like a local file path
+  bool _isLocalFile(String url) {
+    // Local paths usually start with a slash and contain multiple slashes
+    return url.startsWith('/') || url.startsWith('file://');
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
+    // Determine if we should use Image.file or Image.network
+    final isLocal = complaint.imageUrl != null && _isLocalFile(complaint.imageUrl!);
+
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Complaint Details'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      // ... (AppBar and Header Section code is fine) ...
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- Header Section ---
-            Text(complaint.title, style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.location_on_outlined, size: 16, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
-                Text(complaint.location, style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey.shade600)),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
-                Text(DateFormat.yMMMd().format(complaint.date), style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey.shade600)),
-              ],
-            ),
+            // ... (Header Section is fine) ...
+
             const SizedBox(height: 24),
 
-            // --- Image Section ---
+            // --- Image Section: NOW DYNAMICALLY CHOOSING Image.network or Image.file ---
             if (complaint.imageUrl != null)
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: Image.network(
+                child: isLocal
+                    ? Image.file( // Use Image.file for local paths
+                  File(complaint.imageUrl!),
+                  height: 200,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 200,
+                    color: Colors.grey[200],
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.broken_image, size: 50, color: Colors.red),
+                  ),
+                )
+                    : Image.network( // Use Image.network for placeholder/future cloud URLs
                   complaint.imageUrl!,
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    height: 200,
+                    color: Colors.grey[200],
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                  ),
                 ),
               ),
             if (complaint.imageUrl != null) const SizedBox(height: 24),

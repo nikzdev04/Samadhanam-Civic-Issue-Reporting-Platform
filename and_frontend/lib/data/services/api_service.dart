@@ -1,129 +1,137 @@
+// import 'package:helpcivic/data/models/complaint_model.dart';
+// import 'dart:math';
+//
+// // This is a mock API service that simulates network requests for the demo.
+// class ApiService {
+//   // We will store the complaints in memory to simulate a database.
+//   final List<Complaint> _mockComplaints = [
+//     Complaint(
+//         id: 'C001',
+//         title: 'Large Pothole on Station Road',
+//         location: 'Station Road, Kareli, Uttar Pradesh',
+//         latitude: 25.4358,
+//         longitude: 81.8463,
+//         date: DateTime.now().subtract(const Duration(days: 2)),
+//         status: ComplaintStatus.inProgress,
+//         description:
+//         'A large and dangerous pothole has formed in the middle of the street. It needs immediate attention.',
+//         imageUrl:
+//         'https://placehold.co/600x400/cccccc/ffffff?text=Pothole',
+//         timeline: [
+//           TimelineEvent(
+//               status: 'Submitted',
+//               description: 'Complaint submitted by user.',
+//               date: DateTime.now().subtract(const Duration(days: 2))),
+//           TimelineEvent(
+//               status: 'In Progress',
+//               description: 'A team has been assigned to inspect the issue.',
+//               date: DateTime.now().subtract(const Duration(hours: 8))),
+//         ]),
+//   ];
+//
+//   // Simulates fetching all complaints for the user.
+//   Future<List<Complaint>> getMyComplaints() async {
+//     await Future.delayed(const Duration(seconds: 1));
+//     return List.from(_mockComplaints.reversed);
+//   }
+//
+//   // Simulates submitting a new complaint.
+//   // CORRECTED: The parameter name is now 'imageUrl' to match the calling screen.
+//   Future<bool> submitComplaint({
+//     required String title,
+//     required String description,
+//     required String imageUrl, // Expects 'imageUrl'
+//     required String location,
+//     double? latitude,
+//     double? longitude,
+//   }) async {
+//     await Future.delayed(const Duration(milliseconds: 1500));
+//
+//     final newComplaint = Complaint(
+//       id: 'C${Random().nextInt(1000)}',
+//       title: title,
+//       location: location,
+//       latitude: latitude,
+//       longitude: longitude,
+//       date: DateTime.now(),
+//       status: ComplaintStatus.pending,
+//       description: description,
+//       // The passed 'imageUrl' is used here, which is a placeholder from the report screen.
+//       imageUrl: imageUrl,
+//       timeline: [
+//         TimelineEvent(
+//           status: 'Submitted',
+//           description: 'Complaint was submitted by the user.',
+//           date: DateTime.now(),
+//         ),
+//       ],
+//     );
+//
+//     _mockComplaints.add(newComplaint);
+//
+//     // Returns 'true' to indicate success, as expected by the calling screen.
+//     return true;
+//   }
+// }
+//
+
+
+
+// api_service.dart
 import 'package:helpcivic/data/models/complaint_model.dart';
-import 'dart:math';
+import 'package:helpcivic/mongodb.dart';
+import 'package:helpcivic/mongodb.dart'; // 👈 Import your MongoDatabase
 
-// Yeh ek mock API service hai jo network requests ko simulate karti hai.
-// Asli app mein, yeh class http ya dio jaise package ka istemal karke
-// ek real backend server se communicate karegi.
-
+// This is a mock API service that simulates network requests for the demo.
 class ApiService {
-  // Hum ab complaints ko memory mein store karenge taaki list update ho sake.
-  final List<Complaint> _mockComplaints = [
-    Complaint(
-        id: 'C001',
-        title: 'Station Road par paani jama hai',
-        location: 'Station Road, Kareli, Uttar Pradesh',
-        latitude: 25.4358,
-        longitude: 81.8463,
-        date: DateTime.now().subtract(const Duration(days: 2)),
-        status: ComplaintStatus.inProgress,
-        description:
-        'Barish ke baad se Station Road par paani bhar gaya hai, aane jaane mein bahut dikkat ho rahi hai. Naali bhi aage se band hai.',
-        imageUrl:
-        'https://placehold.co/600x400/cccccc/ffffff?text=Water+Logging',
-        timeline: [
-          TimelineEvent(
-              status: 'Jama Ki Gayi',
-              description: 'Shikayat user dwara jama ki gayi.',
-              date: DateTime.now().subtract(const Duration(days: 2))),
-          TimelineEvent(
-              status: 'Dekh Li Gayi',
-              description: 'Nagar Palika Parishad dwara shikayat dekhi gayi.',
-              date: DateTime.now().subtract(const Duration(days: 1))),
-          TimelineEvent(
-              status: 'Kaam Jaari Hai',
-              description: 'Safai karmi team ko bheja ja raha hai.',
-              date: DateTime.now().subtract(const Duration(hours: 8))),
-        ]),
-    Complaint(
-        id: 'C002',
-        title: 'Bijli ka khamba tedha hai',
-        location: 'Allahabad Road, Kareli ke paas',
-        latitude: 25.4410,
-        longitude: 81.8515,
-        date: DateTime.now().subtract(const Duration(days: 15)),
-        status: ComplaintStatus.resolved,
-        description:
-        'Tez hawa ke baad se Allahabad Road par ek bijli ka khamba khatarnak roop se jhuk gaya hai. Kabhi bhi gir sakta hai.',
-        imageUrl:
-        'https://placehold.co/600x400/cccccc/ffffff?text=Electric+Pole',
-        timeline: [
-          TimelineEvent(
-              status: 'Jama Ki Gayi',
-              description: 'Shikayat user dwara jama ki gayi.',
-              date: DateTime.now().subtract(const Duration(days: 15))),
-          TimelineEvent(
-              status: 'Hal Ho Gayi',
-              description: 'Vidyut Vibhag ne khambe ko theek kar diya hai.',
-              date: DateTime.now().subtract(const Duration(days: 3))),
-        ]),
-    Complaint(
-        id: 'C003',
-        title: 'Sabzi Mandi mein kachra',
-        location: 'Sabzi Mandi, Kareli',
-        latitude: 25.4385,
-        longitude: 81.8490,
-        date: DateTime.now().subtract(const Duration(days: 1)),
-        status: ComplaintStatus.pending,
-        description:
-        'Sabzi Mandi ke kone mein kachre ka dher laga hai, jisse bahut badboo aa rahi hai. Ise turant hatwaya jaaye.',
-        imageUrl: 'https://placehold.co/600x400/cccccc/ffffff?text=Kachra',
-        timeline: [
-          TimelineEvent(
-              status: 'Jama Ki Gayi',
-              description: 'Shikayat user dwara jama ki gayi.',
-              date: DateTime.now().subtract(const Duration(days: 1))),
-        ]),
-  ];
+  // Removed _mockComplaints - we will use the actual database
 
-  // User ki saari complaints fetch karne ko simulate karta hai.
+  // Simulates fetching all complaints for the user.
   Future<List<Complaint>> getMyComplaints() async {
-    // 1 second ka network delay simulate karega.
-    await Future.delayed(const Duration(seconds: 1));
-    // Ab hum memory se list return karenge.
-    return List.from(_mockComplaints.reversed);
+    try {
+      final complaintMaps = await MongoDatabase.getComplaints();
+      // Map the MongoDB data to your Dart model
+      return complaintMaps.map((json) => Complaint.fromJson(json)).toList();
+    } catch (e) {
+      print('Error in getMyComplaints: $e');
+      return [];
+    }
   }
 
-  // Nayi complaint submit karne ko simulate karta hai.
+  // Simulates submitting a new complaint.
+  // Now calls MongoDatabase.insertComplaint and returns a boolean for success.
   Future<bool> submitComplaint({
     required String title,
     required String description,
-    required String imagePath,
+    required String imageUrl,
     required String location,
-    double? latitude, // ADDED
-    double? longitude, // ADDED
+    double? latitude,
+    double? longitude,
   }) async {
-    // 1.5 second ka network delay simulate karega.
-    await Future.delayed(const Duration(milliseconds: 1500));
-
-    // Ek nayi complaint banayenge aur use list mein add karenge.
-    final newComplaint = Complaint(
-      id: 'C${Random().nextInt(1000)}',
-      title: title,
-      location: location,
-      latitude: latitude, // ADDED
-      longitude: longitude, // ADDED
-      date: DateTime.now(),
-      status: ComplaintStatus.pending,
-      description: description,
-      imageUrl: imagePath,
-      timeline: [
-        TimelineEvent(
-          status: 'Jama Ki Gayi',
-          description: 'Shikayat user dwara jama ki gayi.',
-          date: DateTime.now(),
-        ),
+    // 1. Prepare the data map for MongoDB insertion
+    final complaintData = {
+      'title': title,
+      'location': location,
+      'latitude': latitude,
+      'longitude': longitude,
+      'raisedDate': DateTime.now().toIso8601String(),
+      'status': ComplaintStatus.pending.toString().split('.').last, // 'pending'
+      'description': description,
+      'imageUrl': imageUrl,
+      'timeline': [
+        {
+          'status': 'Submitted',
+          'description': 'Complaint was submitted by the user.',
+          'date': DateTime.now().toIso8601String(),
+        },
       ],
-    );
+      // 'userId' will be added in MongoDatabase.insertComplaint
+    };
 
-    _mockComplaints.add(newComplaint);
+    // 2. Call the database function
+    final String? complaintId = await MongoDatabase.insertComplaint(complaintData);
 
-    print('--- Nayi Shikayat Jama Ki Gayi ---');
-    print('Title: $title');
-    print('Location: $location ($latitude, $longitude)'); // Updated log
-    print('Total Shikayatein: ${_mockComplaints.length}');
-    print('---------------------------------');
-
-    // Success (true) return karega.
-    return true;
+    // 3. Check for success and return boolean
+    return complaintId != null;
   }
 }

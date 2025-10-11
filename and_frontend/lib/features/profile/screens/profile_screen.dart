@@ -1,7 +1,87 @@
 import 'package:flutter/material.dart';
+import 'package:helpcivic/data/services/api_service.dart'; // To fetch complaints
+import 'package:helpcivic/data/models/complaint_model.dart'; // For ComplaintStatus
+import 'package:helpcivic/mongodb.dart'; // To fetch user details
+import 'package:helpcivic/app/router.dart'; // For navigation (Logout, etc.)
 
-class ProfileScreen extends StatelessWidget {
+// Data structure to hold all necessary profile data
+class ProfileData {
+  final String name;
+  final String email;
+  final int reportedCount;
+  final int resolvedCount;
+  final int rewardsCount;
+
+  ProfileData({
+    required this.name,
+    required this.email,
+    required this.reportedCount,
+    required this.resolvedCount,
+    required this.rewardsCount,
+  });
+}
+
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final ApiService _apiService = ApiService();
+  late Future<ProfileData> _profileDataFuture;
+
+  // Initial state for user info before fetching
+  String _userName = 'Citizen';
+  String _userEmail = 'loading...';
+
+  @override
+  void initState() {
+    super.initState();
+    _profileDataFuture = _fetchProfileData();
+  }
+
+  // --- Core Data Fetching Function ---
+  Future<ProfileData> _fetchProfileData() async {
+    // 1. Fetch User Details (Name and Email)
+    if (MongoDatabase.loggedInUserId != null) {
+      try {
+        final user = await MongoDatabase.getUserById(MongoDatabase.loggedInUserId!);
+        if (user != null) {
+          setState(() {
+            _userName = user['name'] as String;
+            _userEmail = user['email'] as String;
+          });
+        }
+      } catch (e) {
+        print("Error fetching user data: $e");
+      }
+    }
+
+    // 2. Fetch Complaint Statistics
+    int reportedCount = 0;
+    int resolvedCount = 0;
+
+    try {
+      final complaints = await _apiService.getMyComplaints();
+      reportedCount = complaints.length;
+      resolvedCount = complaints.where((c) => c.status == ComplaintStatus.resolved).length;
+    } catch (e) {
+      print("Error fetching complaint stats: $e");
+    }
+
+    // NOTE: Rewards count is currently hardcoded for lack of a rewards system
+    const int rewardsCount = 12;
+
+    return ProfileData(
+      name: _userName,
+      email: _userEmail,
+      reportedCount: reportedCount,
+      resolvedCount: resolvedCount,
+      rewardsCount: rewardsCount,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,10 +99,15 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Dynamic Header: Uses state variables updated in _fetchProfileData
             _buildProfileHeader(context),
             const SizedBox(height: 24),
+
+            // Dynamic Stats: Uses FutureBuilder to display statistics
             _buildStatsSection(context),
             const SizedBox(height: 24),
+
+            // Action List
             _buildActionList(context),
           ],
         ),
@@ -30,6 +115,9 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  // --- DYNAMIC WIDGETS ---
+
+  // Fetches name and email from state variables
   Widget _buildProfileHeader(BuildContext context) {
     return Column(
       children: [
@@ -37,33 +125,48 @@ class ProfileScreen extends StatelessWidget {
           radius: 50,
           backgroundColor: Colors.grey,
           child: Icon(Icons.person_outline_rounded, size: 50, color: Colors.white),
-          // In a real app, you would use a NetworkImage or FileImage here
-          // backgroundImage: NetworkImage('user_image_url'),
         ),
         const SizedBox(height: 12),
         Text(
-          'Vayu', // Replace with dynamic user name
+          _userName, // DYNAMIC NAME
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 4),
         Text(
-          'cs23Vayu@rbmi.in', // Replace with dynamic user email
+          _userEmail, // DYNAMIC EMAIL
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey.shade600),
         ),
       ],
     );
   }
 
+  // Uses FutureBuilder to display dynamic stats
   Widget _buildStatsSection(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildStatItem(context, count: '8', label: 'Reported'),
-        _buildStatItem(context, count: '5', label: 'Resolved'),
-        _buildStatItem(context, count: '12', label: 'Rewards'),
-      ],
+    return FutureBuilder<ProfileData>(
+      future: _profileDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        // Use a default/error data if snapshot has no data or an error
+        final data = snapshot.data ?? ProfileData(
+          name: '', email: '', reportedCount: 0, resolvedCount: 0, rewardsCount: 0,
+        );
+
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildStatItem(context, count: data.reportedCount.toString(), label: 'Reported'),
+            _buildStatItem(context, count: data.resolvedCount.toString(), label: 'Resolved'),
+            _buildStatItem(context, count: data.rewardsCount.toString(), label: 'Rewards'),
+          ],
+        );
+      },
     );
   }
+
+  // --- STATIC WIDGETS (Modified only slightly for logic) ---
 
   Widget _buildStatItem(BuildContext context, {required String count, required String label}) {
     return Column(
@@ -84,6 +187,16 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildActionList(BuildContext context) {
     return Column(
       children: [
+        // Navigate to Complaint List using the router (if needed)
+        _buildActionListItem(
+          context,
+          icon: Icons.list_alt_rounded,
+          title: 'My Complaints',
+          // The correct way to call the named route is using the class:
+          onTap: () => Navigator.pushNamed(context, AppRouter.complaintsList),
+        ),
+        const Divider(height: 24),
+
         _buildActionListItem(
           context,
           icon: Icons.edit_outlined,
@@ -115,8 +228,10 @@ class ProfileScreen extends StatelessWidget {
           title: 'Logout',
           color: Colors.red.shade400,
           onTap: () {
+            // Clear the loggedInUserId before navigating
+            MongoDatabase.loggedInUserId = null;
             // Navigate back to login screen and remove all previous routes
-            Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+            Navigator.pushNamedAndRemoveUntil(context, AppRouter.login, (route) => false);
           },
         ),
       ],
